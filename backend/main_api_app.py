@@ -378,8 +378,8 @@ _loaded_integrations = set()
 # Blacklist integrations that crash during loading (Python 3.13 compatibility issues)
 _blacklisted_integrations = {
     # "atom_agent",  # Crashes due to numpy/lancedb issues
-    "unified_calendar",  # May have similar issues
-    "unified_task",  # May have similar issues
+    # "unified_calendar",  # Migrated to DB-backed scheduling
+    # "unified_task",  # Migrated to DB-backed scheduling
     # "unified_search" - NOW USING MOCK, SAFE TO AUTO-LOAD!
 }
 
@@ -615,6 +615,35 @@ try:
         logger.warning(f"Failed to load BYOK routes: {e}")
     except Exception as e:
         logger.warning(f"Failed to load entity type routes: {e}")
+
+    # AI Scheduling Routes
+    try:
+        from api.schedule_routes import router as schedule_router
+        app.include_router(schedule_router)
+        logger.info("✓ AI Scheduling Routes Loaded")
+    except ImportError as e:
+        logger.warning(f"Failed to load AI scheduling routes: {e}")
+
+    try:
+        from api.scheduling_preferences_routes import router as sched_prefs_router
+        app.include_router(sched_prefs_router)
+        logger.info("✓ Scheduling Preferences Routes Loaded")
+    except ImportError as e:
+        logger.warning(f"Failed to load scheduling preferences routes: {e}")
+
+    try:
+        from api.scheduled_task_routes import router as sched_task_router
+        app.include_router(sched_task_router)
+        logger.info("✓ Scheduled Task Routes Loaded")
+    except ImportError as e:
+        logger.warning(f"Failed to load scheduled task routes: {e}")
+
+    try:
+        from api.habit_routes import router as habit_router
+        app.include_router(habit_router)
+        logger.info("✓ Habit Routes Loaded")
+    except ImportError as e:
+        logger.warning(f"Failed to load habit routes: {e}")
 
     try:
         from api.skill_suggestion_routes import router as skill_suggestion_router
